@@ -20,12 +20,13 @@ PWA**, and **multi-panel responsive** — no WebXR/3D dependencies.
 |---|---|
 | **Design tokens** | Dark-first theme tuned to the Quest LCD (no pure black/white), generous radii, a `touch` spacing scale (48 / 56px), larger root font for VR legibility |
 | **Multi-panel** | `PanelGroup` + `usePanelSize` reflow the layout live via `ResizeObserver`; `QuestPanel` fills the Horizon OS window edge-to-edge |
+| **Multi-window** | `lib/window-bus.ts` + `useSharedWindowState` coordinate **separate** browser windows (placed around you in 3D space) via `postMessage` + `BroadcastChannel` |
 | **PWA** | `app/manifest.ts` (landscape, standalone, maskable icons), `public/sw.js` offline service worker, `/offline` fallback, generated icons |
 | **Components** | shadcn/ui primitives (Button w/ Quest `xl`/`icon-touch` sizes, Card, Badge, Switch, Separator, ScrollArea) + theme toggle |
 | **Registry** | `registry.json` so the Quest components install via the shadcn CLI and **Open in v0** |
 | **Docs** | [`docs/QUEST_GUIDELINES.md`](docs/QUEST_GUIDELINES.md) — the full Quest web checklist with sources |
 
-Routes: `/` landing · `/panels` multi-panel demo.
+Routes: `/` landing · `/panels` multi-panel demo · `/windows` multi-window demo (+ `/windows/detail`).
 
 ---
 
@@ -52,6 +53,7 @@ app/
   layout.tsx        # metadata, viewport, theme provider, SW registration
   page.tsx          # landing (feature grid via PanelGroup)
   panels/page.tsx   # multi-panel responsive demo
+  windows/          # multi-window demo (page = controller, detail/ = child, demo-ui.tsx = shared)
   manifest.ts       # PWA manifest → /manifest.webmanifest
   offline/page.tsx  # offline fallback
   globals.css       # Tailwind v4 + Quest-tuned design tokens
@@ -59,8 +61,8 @@ components/
   ui/               # shadcn/ui primitives
   quest/            # QuestPanel, PanelGroup
   theme-provider.tsx, theme-toggle.tsx, register-sw.tsx, open-in-v0-button.tsx
-hooks/              # usePanelSize
-lib/                # utils (cn), quest (platform constants)
+hooks/              # usePanelSize, useSharedWindowState
+lib/                # utils (cn), quest (platform constants), window-bus (cross-window messaging)
 public/             # sw.js, icons/
 scripts/            # generate-icons.mjs
 registry.json       # shadcn / v0 registry
@@ -89,6 +91,38 @@ npx shadcn@latest add https://your-deploy.vercel.app/r/panel-group.json
 
 > Note: the v0 "open" endpoint doesn't apply per-item `cssVars`/`css`/`envVars`,
 > so this template keeps theme tokens in `app/globals.css`.
+
+---
+
+## Multi-panel vs multi-window
+
+Two different things, both useful on Quest:
+
+- **Multi-panel** (`/panels`) — *one* window whose layout reflows into multiple
+  columns as it's resized (`PanelGroup` + `usePanelSize`). One browsing context.
+- **Multi-window** (`/windows`) — *several* browser windows the user arranges
+  anywhere around them in 3D space, each its own browsing context, **coordinated
+  with each other**. Open one with `window.open()`; keep them in sync over a
+  `BroadcastChannel` (works even when COOP nulls `window.opener`), with direct
+  `window.postMessage` available for targeting a specific window or sending
+  zero-copy `Transferable`s (e.g. an `ImageBitmap`).
+
+The plumbing is `lib/window-bus.ts` (a tiny typed bus) and the
+`useSharedWindowState` hook. The demo shares a `{ count, accent, note }` object:
+change it in any window — controller or detached — and every window updates live.
+
+```ts
+import { useSharedWindowState } from "@/hooks/use-shared-window-state";
+
+const { state, setState, openWindow } = useSharedWindowState("my-app", { count: 0 });
+// open a window the user can place in space; it syncs automatically:
+openWindow("/windows/detail", "detail", "popup,width=900,height=720");
+setState((s) => ({ ...s, count: s.count + 1 })); // broadcasts to every window
+```
+
+> Note: `window.open()` must be called from a user gesture (a click). For very
+> large/streamed payloads, prefer `bus.postTo(win, data, [transferable])` to move
+> bytes without copying.
 
 ---
 

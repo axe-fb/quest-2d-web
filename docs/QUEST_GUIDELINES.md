@@ -64,6 +64,13 @@ Legend: ✅ covered by a template here · ➕ recommended add-on for your app.
   (title bar, close/minimize/theater) — don't duplicate it. (`QuestPanel`.)
 - ✅ **Don't break when narrow/short.** Collapse multi-column to a single
   scrolling column under ~760px.
+- ✅ **Multi-window coordination (2D web).** Beyond multi-*panel* (one resizable
+  window), you can `window.open()` **separate** windows the user arranges around
+  them in 3D space, and keep them in sync. Use a **BroadcastChannel** for
+  same-origin broadcast (it survives COOP nulling `window.opener`), plus direct
+  `window.postMessage(msg, origin, [transferable])` to target one window or send
+  zero-copy `ImageBitmap`/`ArrayBuffer`. Origin-check every inbound message. (See
+  `lib/window-bus.ts` + `useSharedWindowState` in this template.)
 - ➕ **No programmatic window placement.** There's no web API to move/tile the
   user's panels; panel arrangement is a user action. (Feature-detect
   `window.getScreenDetails()` if you experiment — Quest support is unconfirmed.)

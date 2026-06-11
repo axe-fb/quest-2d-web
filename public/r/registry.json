@@ -36,6 +36,21 @@
       "files": [
         { "path": "components/quest/panel-group.tsx", "type": "registry:component" }
       ]
+    },
+    {
+      "name": "window-bus",
+      "type": "registry:lib",
+      "title": "Window Bus",
+      "description": "Coordinate multiple browser windows over postMessage + BroadcastChannel (origin-checked, with zero-copy Transferables). On Quest, each window is a panel the user places in 3D space.",
+      "files": [{ "path": "lib/window-bus.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "use-shared-window-state",
+      "type": "registry:hook",
+      "title": "useSharedWindowState",
+      "description": "Share one state object across every same-origin browser window on a named channel; any window updates it and all windows converge, with hello/sync on open.",
+      "registryDependencies": ["window-bus"],
+      "files": [{ "path": "hooks/use-shared-window-state.ts", "type": "registry:hook" }]
     }
   ]
 }

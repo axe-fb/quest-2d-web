@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  AppWindow,
   Blocks,
   Boxes,
   CloudOff,
@@ -32,6 +33,12 @@ const features = [
     title: "Multi-panel layout",
     description:
       "Fluid 500–2000px layout that reflows live via ResizeObserver — built for side-by-side resizable windows.",
+  },
+  {
+    icon: AppWindow,
+    title: "Multi-window sync",
+    description:
+      "Spawn separate windows you place around you in 3D space, kept in sync via postMessage + BroadcastChannel.",
   },
   {
     icon: Sparkles,
@@ -98,6 +105,12 @@ export default function Home() {
             </Link>
           </Button>
           <Button asChild size="xl" variant="outline">
+            <Link href="/windows">
+              <AppWindow />
+              Multi-window demo
+            </Link>
+          </Button>
+          <Button asChild size="xl" variant="ghost">
             <a
               href="https://developers.meta.com/horizon/documentation/web/pwa-gs/"
               target="_blank"
