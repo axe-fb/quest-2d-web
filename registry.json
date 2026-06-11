@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "quest-2d-web",
+  "homepage": "https://quest-2d-web.vercel.app",
+  "items": [
+    {
+      "name": "quest-lib",
+      "type": "registry:lib",
+      "title": "Quest constants",
+      "description": "Meta Quest browser platform constants (2D panel sizes, hit targets) and a browser-detection helper.",
+      "files": [{ "path": "lib/quest.ts", "type": "registry:lib" }]
+    },
+    {
+      "name": "use-panel-size",
+      "type": "registry:hook",
+      "title": "usePanelSize",
+      "description": "Track a container's live size with a ResizeObserver and bucket it against the Quest panel envelope, for layouts that reflow as windows resize.",
+      "registryDependencies": ["quest-lib"],
+      "files": [{ "path": "hooks/use-panel-size.ts", "type": "registry:hook" }]
+    },
+    {
+      "name": "quest-panel",
+      "type": "registry:component",
+      "title": "Quest Panel",
+      "description": "An edge-to-edge content panel sized for the Horizon OS window model, with header/body/footer parts and 48px touch targets.",
+      "files": [
+        { "path": "components/quest/quest-panel.tsx", "type": "registry:component" }
+      ]
+    },
+    {
+      "name": "panel-group",
+      "type": "registry:component",
+      "title": "Panel Group",
+      "description": "Responsive multi-panel layout that derives its column count from the live container width — built for side-by-side resizable Quest windows.",
+      "registryDependencies": ["use-panel-size"],
+      "files": [
+        { "path": "components/quest/panel-group.tsx", "type": "registry:component" }
+      ]
+    }
+  ]
+}
